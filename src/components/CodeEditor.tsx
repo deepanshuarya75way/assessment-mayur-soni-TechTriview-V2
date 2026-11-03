@@ -24,6 +24,12 @@ function CodeEditor() {
   const room = useRoom();
   const yProvider = getYjsProviderForRoom(room);
 
+  const difficultyStyles = {
+    Easy: "bg-green-500/10 text-green-500 border border-green-500/20",
+    Medium: "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20",
+    Hard: "bg-red-500/10 text-red-500 border border-red-500/20",
+  };
+
   useEffect(() => {
     let binding: MonacoBinding;
 
@@ -87,7 +93,14 @@ function CodeEditor() {
                     <SelectContent>
                       {CODING_QUESTIONS.map((q) => (
                         <SelectItem key={q.id} value={q.id}>
-                          {q.title}
+                          <span>{q.title}</span>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                              difficultyStyles[q.difficulty]
+                            }`}
+                          >
+                            {q.difficulty}
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>
