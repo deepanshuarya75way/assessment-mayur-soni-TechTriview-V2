@@ -29,4 +29,31 @@ export default defineSchema({
     interviewerId: v.string(),
     interviewId: v.id("interviews"),
   }).index("by_interview_id", ["interviewId"]),
+
+  codingQuestions: defineTable({
+    id: v.string(),
+    title: v.string(),
+    difficulty: v.union(
+      v.literal("Easy"),
+      v.literal("Medium"),
+      v.literal("Hard")
+    ),
+    description: v.string(),
+
+    examples: v.array(
+      v.object({
+        input: v.string(),
+        output: v.string(),
+        explanation: v.optional(v.string()),
+      })
+    ),
+
+    constraints: v.optional(v.array(v.string())),
+
+    starterCode: v.object({
+      javascript: v.string(),
+      python: v.string(),
+      java: v.string(),
+    }),
+  }).index("by_question_id", ["id"]),
 });

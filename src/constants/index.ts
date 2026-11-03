@@ -90,13 +90,7 @@ export const CODING_QUESTIONS: CodeQuestion[] = [
         
     }
 }`,
-      cpp: `class Solution {
-public:
-    vector<int> twoSum(vector<int>& nums, int target) {
-        // Write your solution here
-
-    }
-};`,
+   
     },
     constraints: [
       "2 ≤ nums.length ≤ 104",
@@ -135,13 +129,7 @@ public:
         
     }
 }`,
-      cpp: `class Solution {
-public:
-    void reverseString(vector<char>& s) {
-        // Write your solution here
-
-    }
-};`,
+   
     },
     constraints: [
       "1 ≤ s.length ≤ 105",
@@ -181,13 +169,7 @@ public:
         
     }
 }`,
-      cpp: `class Solution {
-public:
-    bool isPalindrome(int x) {
-        // Write your solution here
-
-    }
-};`,
+     
     },
     constraints: [
       "-231 ≤ x ≤ 231 - 1",
@@ -195,11 +177,26 @@ public:
   },
 ];
 
+// export const LANGUAGES = [
+//   { id: "javascript", name: "JavaScript", icon: "/javascript.png" },
+//   { id: "python", name: "Python", icon: "/python.png" },
+//   { id: "java", name: "Java", icon: "/java.png" },
+//   { id: "cpp", name: "C++"},
+// ] as const;
+
 export const LANGUAGES = [
-  { id: "javascript", name: "JavaScript", icon: "/javascript.png" },
-  { id: "python", name: "Python", icon: "/python.png" },
-  { id: "java", name: "Java", icon: "/java.png" },
-  { id: "cpp", name: "C++"},
+  {
+    id: "javascript",
+    name: "JavaScript",
+  },
+  {
+    id: "python",
+    name: "Python",
+  },
+  {
+    id: "java",
+    name: "Java",
+  },
 ] as const;
 
 export interface CodeQuestion {
@@ -216,7 +213,6 @@ export interface CodeQuestion {
     javascript: string;
     python: string;
     java: string;
-    cpp: string;
   };
   constraints?: string[];
 }

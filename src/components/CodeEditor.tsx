@@ -1,4 +1,10 @@
-import { CODING_QUESTIONS, LANGUAGES } from "@/constants";
+// import { CODING_QUESTIONS, LANGUAGES } from "@/constants";
+
+import { LANGUAGES } from "@/constants";
+import { useQuery } from "convex/react";
+import { api } from "../../convex/_generated/api";
+import { Doc } from "../../convex/_generated/dataModel";
+
 import { useCallback, useEffect, useState } from "react";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "./ui/resizable";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
@@ -15,9 +21,25 @@ import { useRoom } from "@liveblocks/react/suspense";
 import { Awareness } from "y-protocols/awareness";
 
 function CodeEditor() {
-  const [selectedQuestion, setSelectedQuestion] = useState(CODING_QUESTIONS[0]);
-  const [language, setLanguage] = useState<"javascript" | "python" | "java">(LANGUAGES[0].id);
-  const [code, setCode] = useState(selectedQuestion.starterCode[language]);
+  // const [selectedQuestion, setSelectedQuestion] = useState(CODING_QUESTIONS[0]);
+  // const [language, setLanguage] = useState<"javascript" | "python" | "java">(LANGUAGES[0].id);
+  // const [code, setCode] = useState(selectedQuestion.starterCode[language]);
+
+  const codingQuestions = useQuery(api.codingQuestions.getCodingQuestions);
+
+  const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
+
+  const [language, setLanguage] = useState<"javascript" | "python" | "java">(
+    LANGUAGES[0].id
+  );
+
+  const selectedQuestion: Doc<"codingQuestions"> | undefined =
+  codingQuestions?.find((q) => q.id === selectedQuestionId) ??
+  codingQuestions?.[0];
+
+  const [code, setCode] = useState("");
+
+
 
   const [editorRef, setEditorRef] = useState<editor.IStandaloneCodeEditor>();
 
@@ -29,6 +51,18 @@ function CodeEditor() {
     Medium: "bg-yellow-500/10 text-yellow-500 border border-yellow-500/20",
     Hard: "bg-red-500/10 text-red-500 border border-red-500/20",
   };
+
+  useEffect(() => {
+    if (selectedQuestion) {
+      setCode(selectedQuestion.starterCode[language]);
+    }
+  }, [selectedQuestion?._id, language]);
+
+  useEffect(() => {
+    if (codingQuestions?.length && !selectedQuestionId) {
+      setSelectedQuestionId(codingQuestions[0].id);
+    }
+  }, [codingQuestions, selectedQuestionId]);
 
   useEffect(() => {
     let binding: MonacoBinding;
@@ -55,16 +89,46 @@ function CodeEditor() {
     setEditorRef(e);
   }, []);
 
+  // const handleQuestionChange = (questionId: string) => {
+  //   const question = CODING_QUESTIONS.find((q) => q.id === questionId)!;
+  //   setSelectedQuestion(question);
+  //   setCode(question.starterCode[language]);
+  // };
   const handleQuestionChange = (questionId: string) => {
-    const question = CODING_QUESTIONS.find((q) => q.id === questionId)!;
-    setSelectedQuestion(question);
-    setCode(question.starterCode[language]);
+  const question = codingQuestions?.find((q) => q.id === questionId);
+
+  if (!question) return;
+
+  setSelectedQuestionId(questionId);
+  setCode(question.starterCode[language]);
+};
+
+  // const handleLanguageChange = (newLanguage: "javascript" | "python" | "java") => {
+  //   setLanguage(newLanguage);
+  //   setCode(selectedQuestion.starterCode[newLanguage]);
+  // };
+
+  const handleLanguageChange = (
+    newLanguage: "javascript" | "python" | "java"
+  ) => {
+    setLanguage(newLanguage);
+
+    if (selectedQuestion) {
+      setCode(selectedQuestion.starterCode[newLanguage]);
+    }
   };
 
-  const handleLanguageChange = (newLanguage: "javascript" | "python" | "java") => {
-    setLanguage(newLanguage);
-    setCode(selectedQuestion.starterCode[newLanguage]);
-  };
+  if (codingQuestions === undefined) {
+    return <div className="p-6">Loading coding questions...</div>;
+  }
+
+  if (codingQuestions.length === 0) {
+    return <div className="p-6">No coding questions available.</div>;
+  }
+
+  if (!selectedQuestion) {
+    return <div className="p-6">Loading question...</div>;
+  }
 
   return (
     <ResizablePanelGroup direction="vertical" className="min-h-[calc-100vh-4rem-1px]">
@@ -91,7 +155,7 @@ function CodeEditor() {
                       <SelectValue placeholder="Select question" />
                     </SelectTrigger>
                     <SelectContent>
-                      {CODING_QUESTIONS.map((q) => (
+                      {codingQuestions.map((q) => (
                         <SelectItem key={q.id} value={q.id}>
                           <span>{q.title}</span>
                           <span
